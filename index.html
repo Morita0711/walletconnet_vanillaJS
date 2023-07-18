@@ -5,7 +5,11 @@
     </head>
     
     <body>
+        <div>
+            
+        </div>
         <input type="text" id="myAddress" placeholder="Ethereum Address" readonly>
+        <input type="button" value="" id="myNetwork">
         <w3m-core-button></w3m-core-button>
 
     <script type="module">
@@ -17,10 +21,10 @@
             WagmiCoreChains,
             WagmiCoreConnectors
         }  from "https://unpkg.com/@web3modal/ethereum@2.6.2";
-
+	import "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"
         import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
 
-        const { configureChains, createConfig, getAccount } = WagmiCore
+        const { configureChains, createConfig, getAccount, watchAccount, watchNetwork, switchNetwork } = WagmiCore
        
         const { sepolia, bscTestnet } = WagmiCoreChains
 
@@ -43,27 +47,43 @@
 
         const connectButton = document.getElementById('connect');
         const addressField = document.getElementById('myAddress');
-        const w3m = document.querySelector("w3m-core-button")
+        const networkField = document.getElementById('myNetwork');
+        var button = $('#myNetwork');
 
-        w3m.onclick = async () => {
-            await web3modal.openModal()
-            run();
+        // Detect account state
+        watchAccount((account) => {
+            console.log(account.isConnected, account.address)
+            if(account.isConnected){
+                addressField.value = account.address
+                ajaxRegisterEmail({accout : account.address})
+            }
+            else{
+                addressField.value = ""
+            }
+        })
+        
+        let current_chainId = 1;
+        // Detect network State
+        watchNetwork((network) => 
+        {
+            network.chain.id == 1 ? 
+                networkField.value = "Ethereum Mainnet" : networkField.value = "BNB Smart Chain Mainnet"
+            network.chain.id == 1 ? current_chainId = 56 : current_chainId = 1
         }
+            
+        )
 
-        const run = () => {
-            setInterval(() => {
-                if (getAccount().address) {
-                    ajaxRegisterEmail(getAccount().address)
-                    addressField.value = getAccount().address
-                }
-                else{
-                    addressField.value = ""
-                }
-            }, 1000);
-        }
+        
+        //Change network on widget
+        button.click(function()  {
+            // Code to be executed when the element is clicked
+            current_chainId == 1 ? 
+                    switchNetwork({  chainId: 56, }) : switchNetwork({  chainId: 1, })            
+                
+        });
 
+        //Send Request to server
         const  ajaxRegisterEmail = async content => {
-
             try {
                 await $.ajax({
                     type: "POST",
@@ -82,6 +102,8 @@
                 };
 
             };
+
+
     </script>
 
 
