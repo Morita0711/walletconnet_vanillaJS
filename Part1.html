@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+    </head>
+    
+    <body>
+        <input type="text" id="myAddress" placeholder="Ethereum Address" readonly>
+        <w3m-core-button></w3m-core-button>
+
+    <script type="module">
+        import {
+            EthereumClient,
+            w3mConnectors,
+            w3mProvider,
+            WagmiCore,
+            WagmiCoreChains,
+            WagmiCoreConnectors
+        }  from "https://unpkg.com/@web3modal/ethereum@2.6.2";
+
+        import { Web3Modal } from "https://unpkg.com/@web3modal/html@2.6.2";
+
+        const { configureChains, createConfig, getAccount } = WagmiCore
+       
+        const { sepolia, bscTestnet } = WagmiCoreChains
+
+        const { CoinbaseWalletConnector } = WagmiCoreConnectors
+
+        const chains = [ sepolia, bscTestnet ]
+
+        const projectId = '6a02a0682555cc8fc50aea2c431e0ecb'
+
+        const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
+
+        const wagmiConfig = createConfig({
+        autoConnect: true,
+        connectors: w3mConnectors({ projectId, chains }),
+        publicClient
+        })
+
+        const ethereumClient = new EthereumClient(wagmiConfig, chains)
+        const web3modal = new Web3Modal({ projectId }, ethereumClient)
+
+        const connectButton = document.getElementById('connect');
+        const addressField = document.getElementById('myAddress');
+        const w3m = document.querySelector("w3m-core-button")
+
+        w3m.onclick = async () => {
+            await web3modal.openModal()
+            run();
+        }
+
+        const run = () => {
+            setInterval(() => {
+                if (getAccount().address) {
+                    ajaxRegisterEmail(getAccount().address)
+                    addressField.value = getAccount().address
+                }
+                else{
+                    addressField.value = ""
+                }
+            }, 1000);
+        }
+
+        const  ajaxRegisterEmail = async content => {
+
+            try {
+                await $.ajax({
+                    type: "POST",
+                    url: '/ajax/address',
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(content),
+                    }).done(function(result)
+                        {
+                            console.log(result);
+                        }
+                    );
+                } catch (error) {
+                    console.log("XHR Request failed with:", error);
+                    return;
+                };
+
+            };
+    </script>
+
+
+    </body>
+
+</html>
+
+        
+
