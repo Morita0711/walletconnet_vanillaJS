@@ -1,11 +1,13 @@
-; (async () => {
-  // const { PrismaClient } = require("@prisma/client")
-  // const client = new PrismaClient()
+const express = require('express');
+const path = require('path');
 
-  const makeApp = require("./app")
-  const app = await makeApp()
+const app = express();
 
-  app.listen(process.env.PORT, () => {
-    console.log("Eyenia server runs at ", process.env.PORT)
-  })
-})()
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '1.html'));
+});
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
