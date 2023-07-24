@@ -1,12 +1,12 @@
-# Social Experience App
+# WSTFX App Web3 Module
 
 ## Tech needed to install
 * NodeJS
 
 ## Pre-requisite (need to signup for these accounts and setup API keys)
-* Twilio
-* AWS EC2
-* AWS S3
+* Wagmi
+* Ether.js
+
 
 ## Setup
 1. Copy `.envsample` and Paste as `.env` 
